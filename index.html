@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="pageTitle">우리 냥이 집</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <h1 class="site-title" id="siteTitleText">🐾 우리 냥이 집</h1>
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="home">홈</button>
+      <button class="tab-btn" data-tab="calendar">캘린더</button>
+      <button class="tab-btn" data-tab="gallery">사진첩</button>
+      <button class="tab-btn" data-tab="food">간식&음식 기록</button>
+    </nav>
+    <button class="icon-btn" id="settingsBtn" title="설정">⚙️</button>
+  </div>
+</header>
+
+<main>
+
+  <!-- HOME -->
+  <section class="tab-panel active" id="tab-home">
+    <div class="hero">
+      <div class="hero-photo hero-photo-1"><img id="heroImg1" alt="냥이 사진 1"></div>
+      <div class="hero-photo hero-photo-2"><img id="heroImg2" alt="냥이 사진 2"></div>
+      <div class="hero-photo hero-photo-3"><img id="heroImg3" alt="냥이 사진 3"></div>
+      <div class="hero-caption">
+        <h2 id="heroGreeting">오늘도 사랑스러운 우리 냥이들 🐈‍⬛🐈</h2>
+        <p>이 링크로 들어온 모두가 같은 캘린더·사진·기록을 함께 보고 수정해요.</p>
+      </div>
+    </div>
+
+    <div class="cat-profiles">
+      <div class="cat-card" data-cat="cat1">
+        <label class="cat-avatar" title="클릭해서 사진 바꾸기">
+          <img id="cat1Avatar" alt="">
+          <span class="avatar-edit-badge">✎</span>
+          <input type="file" id="cat1AvatarUpload" accept="image/*" hidden>
+        </label>
+        <div class="cat-info">
+          <input type="text" class="cat-name-input" id="cat1NameInput" placeholder="이름을 입력하세요">
+          <span class="cat-badge">삼색이</span>
+        </div>
+      </div>
+      <div class="cat-card" data-cat="cat2">
+        <label class="cat-avatar" title="클릭해서 사진 바꾸기">
+          <img id="cat2Avatar" alt="">
+          <span class="avatar-edit-badge">✎</span>
+          <input type="file" id="cat2AvatarUpload" accept="image/*" hidden>
+        </label>
+        <div class="cat-info">
+          <input type="text" class="cat-name-input" id="cat2NameInput" placeholder="이름을 입력하세요">
+          <span class="cat-badge">턱시도</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="home-widgets">
+      <div class="widget">
+        <h3>📅 다가오는 일정</h3>
+        <ul id="upcomingEventsList" class="widget-list"><li class="empty">일정이 없어요</li></ul>
+        <button class="link-btn" data-goto="calendar">캘린더로 이동 →</button>
+      </div>
+      <div class="widget">
+        <h3>🖼️ 최근 사진</h3>
+        <div id="recentPhotos" class="mini-photo-grid"></div>
+        <button class="link-btn" data-goto="gallery">사진첩으로 이동 →</button>
+      </div>
+      <div class="widget">
+        <h3>🍖 최근 간식 기록</h3>
+        <ul id="recentFoodList" class="widget-list"><li class="empty">기록이 없어요</li></ul>
+        <button class="link-btn" data-goto="food">기록하러 가기 →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- CALENDAR -->
+  <section class="tab-panel" id="tab-calendar">
+    <div class="calendar-header">
+      <button id="prevMonthBtn" class="nav-btn">◀</button>
+      <h2 id="calendarMonthLabel">2026년 8월</h2>
+      <button id="nextMonthBtn" class="nav-btn">▶</button>
+      <button id="todayBtn" class="today-btn">오늘</button>
+    </div>
+    <div class="calendar-grid" id="calendarWeekdays">
+      <div class="weekday sun">일</div><div class="weekday">월</div><div class="weekday">화</div>
+      <div class="weekday">수</div><div class="weekday">목</div><div class="weekday">금</div><div class="weekday sat">토</div>
+    </div>
+    <div class="calendar-grid" id="calendarDays"></div>
+
+    <div class="day-panel" id="dayPanel">
+      <h3 id="dayPanelDate">날짜를 선택하세요</h3>
+      <ul id="dayEventList" class="event-list"></ul>
+      <form id="eventForm" class="inline-form">
+        <input type="text" id="eventTitle" placeholder="일정 제목 (예: 병원 방문)" required>
+        <select id="eventCat">
+          <option value="both">둘 다</option>
+          <option value="cat1">고양이1</option>
+          <option value="cat2">고양이2</option>
+        </select>
+        <select id="eventCategory">
+          <option value="hospital">🏥 병원</option>
+          <option value="grooming">✂️ 미용</option>
+          <option value="birthday">🎂 생일</option>
+          <option value="snack">🍖 간식</option>
+          <option value="etc">📌 기타</option>
+        </select>
+        <input type="text" id="eventMemo" placeholder="메모 (선택)">
+        <button type="submit">추가</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section class="tab-panel" id="tab-gallery">
+    <div class="gallery-toolbar">
+      <div class="filter-group" id="galleryFilter">
+        <button class="filter-btn active" data-filter="all">전체</button>
+        <button class="filter-btn" data-filter="cat1">고양이1</button>
+        <button class="filter-btn" data-filter="cat2">고양이2</button>
+      </div>
+      <label class="upload-btn">
+        📷 사진 추가
+        <input type="file" id="photoUpload" accept="image/*" multiple hidden>
+      </label>
+    </div>
+    <div class="photo-grid" id="photoGrid"></div>
+  </section>
+
+  <!-- FOOD LOG -->
+  <section class="tab-panel" id="tab-food">
+    <form id="foodForm" class="food-form">
+      <h3>새 기록 추가</h3>
+      <div class="food-form-row">
+        <input type="text" id="foodName" placeholder="간식/음식 이름" required>
+        <select id="foodType">
+          <option value="snack">간식</option>
+          <option value="food">사료</option>
+          <option value="can">캔/습식</option>
+          <option value="etc">기타</option>
+        </select>
+        <select id="foodCat">
+          <option value="both">둘 다</option>
+          <option value="cat1">고양이1</option>
+          <option value="cat2">고양이2</option>
+        </select>
+      </div>
+      <div class="food-form-row">
+        <div class="rating-input" id="ratingInput" data-value="0">
+          <span data-star="1">★</span><span data-star="2">★</span><span data-star="3">★</span><span data-star="4">★</span><span data-star="5">★</span>
+        </div>
+        <input type="date" id="foodDate">
+      </div>
+      <textarea id="foodMemo" placeholder="메모 (예: 정말 잘 먹었어요!)" rows="2"></textarea>
+      <button type="submit">기록하기</button>
+    </form>
+
+    <div class="food-toolbar">
+      <div class="filter-group" id="foodFilter">
+        <button class="filter-btn active" data-filter="all">전체</button>
+        <button class="filter-btn" data-filter="cat1">고양이1</button>
+        <button class="filter-btn" data-filter="cat2">고양이2</button>
+      </div>
+    </div>
+    <div class="food-list" id="foodList"></div>
+  </section>
+
+</main>
+
+<!-- Settings Modal -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal">
+    <h3>⚙️ 설정</h3>
+    <label>사이트 이름</label>
+    <input type="text" id="settingsSiteTitle">
+    <label>고양이1 이름</label>
+    <input type="text" id="settingsCat1Name">
+    <label>고양이2 이름</label>
+    <input type="text" id="settingsCat2Name">
+    <div class="modal-actions">
+      <button id="settingsCancelBtn" class="btn-secondary">취소</button>
+      <button id="settingsSaveBtn" class="btn-primary">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- Lightbox Modal -->
+<div class="modal-overlay" id="lightboxModal">
+  <div class="lightbox">
+    <button class="lightbox-close" id="lightboxCloseBtn">✕</button>
+    <img id="lightboxImg" src="" alt="">
+    <div class="lightbox-info">
+      <span id="lightboxCat"></span>
+      <span id="lightboxDate"></span>
+      <button id="lightboxDeleteBtn" class="btn-danger">삭제</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/db.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
