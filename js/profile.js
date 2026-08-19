@@ -304,6 +304,96 @@ function wireGroomingQuickLog(type) {
 wireGroomingQuickLog('bath');
 wireGroomingQuickLog('nail');
 
+/* ---------- Litter log (potty tracking) ---------- */
+const PEE_CONDITIONS = { normal: '정상', blood: '혈뇨', little: '양 적음', lots: '양 많음' };
+const POOP_CONDITIONS = { normal: '정상', soft: '무름', diarrhea: '설사', constipation: '변비', blood: '혈변' };
+const LITTER_BAD = ['blood', 'diarrhea'];
+const LITTER_WARN = ['soft', 'constipation', 'little', 'lots'];
+
+function isToday(isoString) { return isoString.slice(0, 10) === todayStr(); }
+function litterTimeLabel(iso) { return new Date(iso).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }); }
+
+function renderLitterStatus(entries) {
+  const el = document.getElementById('litterStatus');
+  const todays = entries.filter(e => isToday(e.logged_at));
+  if (!todays.length) {
+    el.className = 'toy-status toy-green';
+    el.innerHTML = `<span class="toy-emoji">🚻</span><div class="toy-text"><strong>오늘 기록이 아직 없어요</strong><span>버튼을 눌러 기록해보세요</span></div>`;
+    return;
+  }
+  const hasBad = todays.some(e => LITTER_BAD.includes(e.condition));
+  const hasWarn = todays.some(e => LITTER_WARN.includes(e.condition));
+  let level = 'green', emoji = '🚻', title = '오늘 화장실 상태 좋아요';
+  if (hasBad) { level = 'red'; emoji = '🚨'; title = '오늘 이상 징후가 있어요'; }
+  else if (hasWarn) { level = 'yellow'; emoji = '⚠️'; title = '관찰이 필요해요'; }
+  const peeCount = todays.filter(e => e.type === 'pee').length;
+  const poopCount = todays.filter(e => e.type === 'poop').length;
+  el.className = `toy-status toy-${level}`;
+  el.innerHTML = `<span class="toy-emoji">${emoji}</span><div class="toy-text"><strong>${title}</strong><span>오늘 감자 ${peeCount}번 · 맛동산 ${poopCount}번</span></div>`;
+}
+
+async function renderLitterSection() {
+  const entries = await DB.listLitter(CAT);
+  renderLitterStatus(entries);
+  const todays = entries.filter(e => isToday(e.logged_at));
+  document.getElementById('litterCountPee').textContent = todays.filter(e => e.type === 'pee').length;
+  document.getElementById('litterCountPoop').textContent = todays.filter(e => e.type === 'poop').length;
+
+  const list = document.getElementById('litterList');
+  list.innerHTML = '';
+  entries.slice(0, 15).forEach(e => {
+    const div = document.createElement('div');
+    div.className = 'log-item litter-item';
+    const conditions = e.type === 'pee' ? PEE_CONDITIONS : POOP_CONDITIONS;
+    const tagClass = LITTER_BAD.includes(e.condition) ? 'tag-bad' : LITTER_WARN.includes(e.condition) ? 'tag-warn' : '';
+    div.innerHTML = `
+      <div class="litter-row">
+        <span>${e.type === 'pee' ? '🥔' : '🍫'}</span>
+        <span class="litter-time">${litterTimeLabel(e.logged_at)}</span>
+        ${e.condition !== 'normal' ? `<span class="litter-tag ${tagClass}">${conditions[e.condition] || e.condition}</span>` : ''}
+        ${e.photo_url ? `<img class="litter-photo-thumb" src="${e.photo_url}" alt="">` : ''}
+        ${e.memo ? `<span style="font-size:0.78rem;color:var(--ink-soft)">${escapeHTML(e.memo)}</span>` : ''}
+        <button class="litter-detail-btn" type="button">상세</button>
+        <button class="log-del" type="button">삭제</button>
+      </div>
+      <div class="litter-detail-panel" style="display:none;">
+        <select class="litter-cond-select">
+          ${Object.entries(conditions).map(([v, l]) => `<option value="${v}" ${e.condition === v ? 'selected' : ''}>${l}</option>`).join('')}
+        </select>
+        <input type="text" class="litter-memo-input" placeholder="메모" value="${e.memo ? escapeHTML(e.memo) : ''}">
+        <label class="upload-btn" style="font-size:0.75rem;padding:6px 12px;">
+          사진 첨부
+          <input type="file" accept="image/*" hidden class="litter-photo-input">
+        </label>
+        <button type="button" class="litter-save-btn">저장</button>
+      </div>
+    `;
+    div.querySelector('.litter-detail-btn').addEventListener('click', () => {
+      const panel = div.querySelector('.litter-detail-panel');
+      panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
+    });
+    div.querySelector('.log-del').addEventListener('click', async () => {
+      await DB.deleteLitter(e.id);
+      renderLitterSection();
+    });
+    div.querySelector('.litter-save-btn').addEventListener('click', async () => {
+      const condition = div.querySelector('.litter-cond-select').value;
+      const memo = div.querySelector('.litter-memo-input').value.trim();
+      const photoFile = div.querySelector('.litter-photo-input').files[0];
+      await DB.updateLitter(e.id, { condition, memo });
+      if (photoFile) await DB.uploadLitterPhoto(e.id, photoFile);
+      renderLitterSection();
+    });
+    list.appendChild(div);
+  });
+}
+async function quickLogLitter(type) {
+  await DB.addLitter({ cat: CAT, type });
+  renderLitterSection();
+}
+document.getElementById('litterQuickPee').addEventListener('click', () => quickLogLitter('pee'));
+document.getElementById('litterQuickPoop').addEventListener('click', () => quickLogLitter('poop'));
+
 /* ---------- Init ---------- */
 (async function init() {
   [settings, profile] = await Promise.all([DB.getSettings(), DB.getCatProfile(CAT)]);
@@ -312,4 +402,5 @@ wireGroomingQuickLog('nail');
   await renderWeightSection();
   await renderPlaySection();
   await renderGroomingSection();
+  await renderLitterSection();
 })();

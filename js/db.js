@@ -186,6 +186,35 @@ const DB = (() => {
     return rest(`/grooming_log?id=eq.${id}`, { method: 'DELETE' });
   }
 
+  /* ---------- litter log (pee / poop) ---------- */
+  async function listLitter(cat) {
+    return rest(`/litter_log?cat=eq.${cat}&select=*&order=logged_at.desc&limit=200`);
+  }
+  async function addLitter(entry) {
+    const rows = await rest('/litter_log', {
+      method: 'POST',
+      headers: { Prefer: 'return=representation' },
+      body: JSON.stringify({ logged_at: new Date().toISOString(), condition: 'normal', ...entry }),
+    });
+    return rows[0];
+  }
+  async function updateLitter(id, patch) {
+    const rows = await rest(`/litter_log?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: { Prefer: 'return=representation' },
+      body: JSON.stringify(patch),
+    });
+    return rows[0];
+  }
+  async function uploadLitterPhoto(id, file) {
+    const url = await uploadFile(file, 'litter');
+    await updateLitter(id, { photo_url: url });
+    return url;
+  }
+  async function deleteLitter(id) {
+    return rest(`/litter_log?id=eq.${id}`, { method: 'DELETE' });
+  }
+
   return {
     getSettings, updateSettings,
     listEvents, addEvent, deleteEvent,
@@ -196,6 +225,7 @@ const DB = (() => {
     listWeights, addWeight, deleteWeight,
     listPlays, addPlay, deletePlay,
     listGrooming, addGrooming, deleteGrooming,
+    listLitter, addLitter, updateLitter, uploadLitterPhoto, deleteLitter,
     todayStr,
   };
 })();

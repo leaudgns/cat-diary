@@ -333,3 +333,27 @@ main { max-width: 1000px; margin: 0 auto; padding: 24px 20px 60px; }
 .toy-status.toy-green .toy-text strong { color: #4a7a3d; }
 .toy-status.toy-yellow .toy-text strong { color: #8a6d16; }
 .toy-status.toy-red .toy-text strong { color: var(--pink-dark); }
+
+/* ---------- Litter log ---------- */
+.litter-quick { display: flex; gap: 12px; margin-bottom: 16px; }
+.litter-quick-btn {
+  flex: 1; padding: 16px 10px; border-radius: 14px; border: none; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 4px; transition: transform 0.1s;
+}
+.litter-quick-btn:active { transform: scale(0.96); }
+.litter-quick-btn .lq-emoji { font-size: 1.6rem; }
+.litter-quick-btn .lq-label { font-size: 0.85rem; font-weight: 700; }
+.litter-quick-btn .lq-count { font-size: 1.3rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.litter-quick-btn.lq-pee { background: #dceaf6; color: #2c5c85; }
+.litter-quick-btn.lq-poop { background: #ecdfc9; color: var(--tortie-dark); }
+
+.litter-item { flex-direction: column; align-items: stretch; gap: 6px; }
+.litter-item .litter-row { display: flex; align-items: center; gap: 10px; }
+.litter-item .litter-time { font-weight: 700; }
+.litter-item .litter-tag { font-size: 0.7rem; padding: 2px 8px; border-radius: 999px; background: var(--border); }
+.litter-item .litter-tag.tag-warn { background: #fdf3d9; color: #8a6d16; }
+.litter-item .litter-tag.tag-bad { background: #fbe3e0; color: var(--pink-dark); }
+.litter-item .litter-detail-btn { margin-left: auto; border: none; background: transparent; color: var(--ink-soft); cursor: pointer; font-size: 0.78rem; }
+.litter-detail-panel { display: flex; gap: 8px; flex-wrap: wrap; padding-top: 4px; }
+.litter-detail-panel select, .litter-detail-panel input[type="text"] { padding: 6px 8px; border: 1px solid var(--border); border-radius: 7px; font-size: 0.8rem; }
+.litter-photo-thumb { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; }
