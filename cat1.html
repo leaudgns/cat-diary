@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="pageTitle">냥이 프로필</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="profile-back" href="index.html">← 홈</a>
+    <a class="profile-links" id="otherCatLink" href="cat2.html">다른 냥이 보기 →</a>
+  </div>
+</header>
+
+<main>
+  <div class="profile-hero">
+    <div class="profile-avatar"><img id="profileAvatar" alt=""></div>
+    <div>
+      <h2 id="profileName">냥이</h2>
+      <p class="profile-since" id="profileSince">불러오는 중...</p>
+    </div>
+  </div>
+
+  <div class="info-card">
+    <div class="info-card-header">
+      <h3>기본 정보</h3>
+      <button class="info-edit-btn" id="infoEditBtn">✎ 수정</button>
+    </div>
+    <div class="info-grid" id="infoGrid"></div>
+  </div>
+
+  <div class="section-card">
+    <h3>몸무게</h3>
+    <div class="weight-chart-wrap" id="weightChartWrap"></div>
+    <form id="weightForm" class="simple-form">
+      <input type="number" id="weightKg" step="0.01" min="0" placeholder="kg" required>
+      <input type="date" id="weightDate">
+      <input type="text" id="weightMemo" placeholder="메모 (선택)">
+      <button type="submit">기록</button>
+    </form>
+    <div class="log-list" id="weightList"></div>
+  </div>
+
+  <div class="section-card">
+    <h3>놀이 기록</h3>
+    <div class="toy-status" id="toyStatus"></div>
+    <form id="playForm" class="simple-form">
+      <input type="text" id="toyName" placeholder="장난감 이름" required>
+      <input type="date" id="playDate">
+      <input type="text" id="playMemo" placeholder="메모 (선택)">
+      <button type="submit">기록</button>
+    </form>
+    <div class="log-list" id="playList"></div>
+  </div>
+</main>
+
+<script src="js/config.js"></script>
+<script src="js/db.js"></script>
+<script>
+  window.CAT_KEY = 'cat1';
+  window.OTHER_CAT_PAGE = 'cat2.html';
+</script>
+<script src="js/profile.js"></script>
+</body>
+</html>

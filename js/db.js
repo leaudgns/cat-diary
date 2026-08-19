@@ -125,12 +125,60 @@ const DB = (() => {
     return url;
   }
 
+  /* ---------- cat profile (fixed info) ---------- */
+  async function getCatProfile(cat) {
+    const rows = await rest(`/cat_profile?cat=eq.${cat}&select=*`);
+    return rows && rows[0] ? rows[0] : { cat, arrival_date: null, breed: '', birthday: null, gender: '', neutered: false, microchip: '', personality: '', notes: '' };
+  }
+  async function updateCatProfile(cat, patch) {
+    return rest(`/cat_profile?cat=eq.${cat}`, {
+      method: 'PATCH',
+      headers: { Prefer: 'return=representation' },
+      body: JSON.stringify({ ...patch, updated_at: new Date().toISOString() }),
+    });
+  }
+
+  /* ---------- weight log ---------- */
+  async function listWeights(cat) {
+    return rest(`/weight_log?cat=eq.${cat}&select=*&order=measured_date.asc`);
+  }
+  async function addWeight(entry) {
+    const rows = await rest('/weight_log', {
+      method: 'POST',
+      headers: { Prefer: 'return=representation' },
+      body: JSON.stringify(entry),
+    });
+    return rows[0];
+  }
+  async function deleteWeight(id) {
+    return rest(`/weight_log?id=eq.${id}`, { method: 'DELETE' });
+  }
+
+  /* ---------- play log ---------- */
+  async function listPlays(cat) {
+    return rest(`/play_log?cat=eq.${cat}&select=*&order=played_date.desc,created_at.desc`);
+  }
+  async function addPlay(entry) {
+    const rows = await rest('/play_log', {
+      method: 'POST',
+      headers: { Prefer: 'return=representation' },
+      body: JSON.stringify(entry),
+    });
+    return rows[0];
+  }
+  async function deletePlay(id) {
+    return rest(`/play_log?id=eq.${id}`, { method: 'DELETE' });
+  }
+
   return {
     getSettings, updateSettings,
     listEvents, addEvent, deleteEvent,
     listFood, addFood, deleteFood,
     listPhotos, addPhoto, deletePhoto,
     uploadAvatar,
+    getCatProfile, updateCatProfile,
+    listWeights, addWeight, deleteWeight,
+    listPlays, addPlay, deletePlay,
     todayStr,
   };
 })();
