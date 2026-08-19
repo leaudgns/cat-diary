@@ -304,6 +304,36 @@ function wireGroomingQuickLog(type) {
 wireGroomingQuickLog('bath');
 wireGroomingQuickLog('nail');
 
+/* ---------- Water / calorie calculator ---------- */
+function calcAndRenderCalorie() {
+  const kg = parseFloat(document.getElementById('calcWeight').value);
+  const factor = parseFloat(document.getElementById('calcActivity').value);
+  const result = document.getElementById('calcResult');
+  if (!kg || kg <= 0) { result.innerHTML = '<div class="weight-empty">몸무게를 입력해주세요</div>'; return; }
+  const rer = 70 * Math.pow(kg, 0.75);
+  const der = rer * factor;
+  const waterMin = Math.round(kg * 40);
+  const waterMax = Math.round(kg * 50);
+  result.innerHTML = `
+    <div class="calc-tile"><div class="calc-label">기초대사량 (RER)</div><div class="calc-value">${Math.round(rer)}</div><div class="calc-unit">kcal/일</div></div>
+    <div class="calc-tile"><div class="calc-label">일일 권장 칼로리 (DER)</div><div class="calc-value">${Math.round(der)}</div><div class="calc-unit">kcal/일</div></div>
+    <div class="calc-tile"><div class="calc-label">권장 음수량</div><div class="calc-value">${waterMin}~${waterMax}</div><div class="calc-unit">ml/일</div></div>
+  `;
+}
+async function initCalculator() {
+  const weights = await DB.listWeights(CAT);
+  const note = document.getElementById('calcWeightNote');
+  if (weights.length) {
+    const latest = weights[weights.length - 1];
+    document.getElementById('calcWeight').value = latest.weight_kg;
+    note.textContent = `최근 몸무게 ${latest.weight_kg}kg (${latest.measured_date}) 기준으로 채워놨어요 — 필요하면 직접 수정하세요`;
+    calcAndRenderCalorie();
+  } else {
+    note.textContent = '몸무게 기록이 없어요 — 직접 입력해주세요';
+  }
+}
+document.getElementById('calcBtn').addEventListener('click', calcAndRenderCalorie);
+
 /* ---------- Litter log (potty tracking) ---------- */
 const PEE_CONDITIONS = { normal: '정상', blood: '혈뇨', little: '양 적음', lots: '양 많음' };
 const POOP_CONDITIONS = { normal: '정상', soft: '무름', diarrhea: '설사', constipation: '변비', blood: '혈변' };
@@ -400,6 +430,7 @@ document.getElementById('litterQuickPoop').addEventListener('click', () => quick
   renderHero();
   renderInfoDisplay();
   await renderWeightSection();
+  await initCalculator();
   await renderPlaySection();
   await renderGroomingSection();
   await renderLitterSection();

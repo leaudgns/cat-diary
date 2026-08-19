@@ -357,3 +357,11 @@ main { max-width: 1000px; margin: 0 auto; padding: 24px 20px 60px; }
 .litter-detail-panel { display: flex; gap: 8px; flex-wrap: wrap; padding-top: 4px; }
 .litter-detail-panel select, .litter-detail-panel input[type="text"] { padding: 6px 8px; border: 1px solid var(--border); border-radius: 7px; font-size: 0.8rem; }
 .litter-photo-thumb { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; }
+
+/* ---------- Calculator ---------- */
+.calc-note { font-size: 0.8rem; color: var(--ink-soft); margin: 0 0 12px; }
+.calc-result { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+.calc-tile { flex: 1; min-width: 140px; background: var(--cream); border-radius: 12px; padding: 14px; text-align: center; }
+.calc-tile .calc-label { font-size: 0.74rem; color: var(--ink-soft); }
+.calc-tile .calc-value { font-size: 1.35rem; font-weight: 800; color: var(--tortie-dark); margin-top: 4px; font-variant-numeric: tabular-nums; }
+.calc-tile .calc-unit { font-size: 0.7rem; color: var(--ink-soft); }

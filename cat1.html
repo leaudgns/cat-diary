@@ -45,6 +45,24 @@
   </div>
 
   <div class="section-card">
+    <h3>음수량 &amp; 칼로리 계산기</h3>
+    <p class="calc-note" id="calcWeightNote"></p>
+    <div class="simple-form">
+      <input type="number" id="calcWeight" step="0.01" min="0" placeholder="몸무게 (kg)">
+      <select id="calcActivity">
+        <option value="1.0">다이어트 중</option>
+        <option value="1.2" selected>중성화한 성묘 (보통 활동)</option>
+        <option value="1.4">중성화 안 한 성묘</option>
+        <option value="1.6">활동적 / 외출묘</option>
+        <option value="1.1">노묘 (7살 이상)</option>
+        <option value="0.8">비만 관리 중 (감량 목표)</option>
+      </select>
+      <button type="button" id="calcBtn">계산하기</button>
+    </div>
+    <div class="calc-result" id="calcResult"></div>
+  </div>
+
+  <div class="section-card">
     <h3>놀이 기록</h3>
     <div class="toy-status" id="toyStatus"></div>
     <form id="playForm" class="simple-form">
