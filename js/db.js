@@ -215,6 +215,60 @@ const DB = (() => {
     return rest(`/litter_log?id=eq.${id}`, { method: 'DELETE' });
   }
 
+  /* ---------- vet visits ---------- */
+  async function listVetVisits(cat) {
+    return rest(`/vet_visit?cat=eq.${cat}&select=*&order=visit_date.desc`);
+  }
+  async function addVetVisit(entry) {
+    const rows = await rest('/vet_visit', {
+      method: 'POST',
+      headers: { Prefer: 'return=representation' },
+      body: JSON.stringify(entry),
+    });
+    return rows[0];
+  }
+  async function uploadVetPhoto(id, file) {
+    const url = await uploadFile(file, 'vet');
+    await rest(`/vet_visit?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ photo_url: url }) });
+    return url;
+  }
+  async function deleteVetVisit(id) {
+    return rest(`/vet_visit?id=eq.${id}`, { method: 'DELETE' });
+  }
+
+  /* ---------- medications ---------- */
+  async function listMedications(cat) {
+    return rest(`/medication?cat=eq.${cat}&select=*&order=start_date.desc`);
+  }
+  async function addMedication(entry) {
+    const rows = await rest('/medication', {
+      method: 'POST',
+      headers: { Prefer: 'return=representation' },
+      body: JSON.stringify(entry),
+    });
+    return rows[0];
+  }
+  async function updateMedication(id, patch) {
+    return rest(`/medication?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify(patch) });
+  }
+  async function deleteMedication(id) {
+    return rest(`/medication?id=eq.${id}`, { method: 'DELETE' });
+  }
+  async function listMedicationLogs(medicationIds) {
+    if (!medicationIds.length) return [];
+    return rest(`/medication_log?medication_id=in.(${medicationIds.join(',')})&select=*`);
+  }
+  async function setMedicationLog(medicationId, logDate, slot, taken) {
+    if (taken) {
+      return rest('/medication_log', {
+        method: 'POST',
+        headers: { Prefer: 'resolution=ignore-duplicates' },
+        body: JSON.stringify({ medication_id: medicationId, log_date: logDate, slot }),
+      });
+    }
+    return rest(`/medication_log?medication_id=eq.${medicationId}&log_date=eq.${logDate}&slot=eq.${slot}`, { method: 'DELETE' });
+  }
+
   return {
     getSettings, updateSettings,
     listEvents, addEvent, deleteEvent,
@@ -226,6 +280,9 @@ const DB = (() => {
     listPlays, addPlay, deletePlay,
     listGrooming, addGrooming, deleteGrooming,
     listLitter, addLitter, updateLitter, uploadLitterPhoto, deleteLitter,
+    listVetVisits, addVetVisit, uploadVetPhoto, deleteVetVisit,
+    listMedications, addMedication, updateMedication, deleteMedication,
+    listMedicationLogs, setMedicationLog,
     todayStr,
   };
 })();

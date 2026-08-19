@@ -365,3 +365,19 @@ main { max-width: 1000px; margin: 0 auto; padding: 24px 20px 60px; }
 .calc-tile .calc-label { font-size: 0.74rem; color: var(--ink-soft); }
 .calc-tile .calc-value { font-size: 1.35rem; font-weight: 800; color: var(--tortie-dark); margin-top: 4px; font-variant-numeric: tabular-nums; }
 .calc-tile .calc-unit { font-size: 0.7rem; color: var(--ink-soft); }
+
+/* ---------- Vet visit / medication ---------- */
+.vet-item .vet-hospital { font-weight: 700; }
+.vet-item .vet-cost { color: var(--tortie-dark); font-weight: 700; }
+.vet-item .vet-photo-thumb { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; }
+
+.med-item { background: var(--cream); border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; }
+.med-item-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+.med-name { font-weight: 700; }
+.med-period { font-size: 0.72rem; color: var(--ink-soft); }
+.med-end-btn { margin-left: auto; font-size: 0.75rem; color: var(--pink-dark); background: none; border: none; cursor: pointer; }
+.med-checks { display: flex; gap: 10px; }
+.med-check { display: flex; align-items: center; gap: 5px; font-size: 0.85rem; cursor: pointer; background: white; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border); }
+.med-check input { cursor: pointer; }
+.med-check.checked { background: var(--sage); color: white; border-color: var(--sage); }
+.med-past-item { opacity: 0.75; }

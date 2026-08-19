@@ -115,6 +115,42 @@
     </form>
     <div class="log-list" id="groomList_nail"></div>
   </div>
+
+  <div class="section-card">
+    <h3>병원 진료 기록</h3>
+    <div class="calc-result" id="vetStats"></div>
+    <form id="vetForm" class="simple-form">
+      <input type="date" id="vetDate">
+      <input type="text" id="vetHospital" placeholder="병원 이름">
+      <input type="text" id="vetReason" placeholder="사유 (예: 정기검진)">
+      <input type="number" id="vetCost" placeholder="진료비 (원)" min="0">
+      <input type="text" id="vetMemo" placeholder="메모 (선택)">
+      <label class="upload-btn" style="font-size: 0.78rem; padding: 8px 14px;">
+        사진
+        <input type="file" id="vetPhotoInput" accept="image/*" hidden>
+      </label>
+      <button type="submit">기록</button>
+    </form>
+    <div class="log-list" id="vetList"></div>
+  </div>
+
+  <div class="section-card">
+    <h3>복약 체크</h3>
+    <div id="medActiveList"></div>
+    <button type="button" class="link-btn" id="medAddToggleBtn" style="margin: 10px 0; display: inline-block;">+ 새 약 등록</button>
+    <form id="medForm" class="simple-form" style="display: none;">
+      <input type="text" id="medName" placeholder="약 이름" required>
+      <input type="date" id="medStart">
+      <input type="date" id="medEnd">
+      <select id="medTimesPerDay">
+        <option value="1">하루 1번</option>
+        <option value="2">하루 2번 (아침/저녁)</option>
+      </select>
+      <input type="text" id="medMemo" placeholder="메모 (선택)">
+      <button type="submit">등록</button>
+    </form>
+    <div id="medPastList"></div>
+  </div>
 </main>
 
 <script src="js/config.js"></script>

@@ -424,6 +424,144 @@ async function quickLogLitter(type) {
 document.getElementById('litterQuickPee').addEventListener('click', () => quickLogLitter('pee'));
 document.getElementById('litterQuickPoop').addEventListener('click', () => quickLogLitter('poop'));
 
+/* ---------- Vet visits ---------- */
+document.getElementById('vetDate').value = todayStr();
+document.getElementById('vetForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const hospital = document.getElementById('vetHospital').value.trim();
+  const costRaw = document.getElementById('vetCost').value;
+  const visit = await DB.addVetVisit({
+    cat: CAT,
+    visit_date: document.getElementById('vetDate').value || todayStr(),
+    hospital,
+    reason: document.getElementById('vetReason').value.trim(),
+    cost: costRaw ? parseInt(costRaw, 10) : null,
+    memo: document.getElementById('vetMemo').value.trim(),
+  });
+  const photoFile = document.getElementById('vetPhotoInput').files[0];
+  if (photoFile) await DB.uploadVetPhoto(visit.id, photoFile);
+  document.getElementById('vetForm').reset();
+  document.getElementById('vetDate').value = todayStr();
+  renderVetSection();
+});
+async function renderVetSection() {
+  const visits = await DB.listVetVisits(CAT);
+  const totalCost = visits.reduce((sum, v) => sum + (v.cost || 0), 0);
+  const thisMonth = todayStr().slice(0, 7);
+  const monthCost = visits.filter(v => v.visit_date.startsWith(thisMonth)).reduce((sum, v) => sum + (v.cost || 0), 0);
+  document.getElementById('vetStats').innerHTML = `
+    <div class="calc-tile"><div class="calc-label">총 진료 횟수</div><div class="calc-value">${visits.length}</div><div class="calc-unit">회</div></div>
+    <div class="calc-tile"><div class="calc-label">누적 진료비</div><div class="calc-value">${totalCost.toLocaleString()}</div><div class="calc-unit">원</div></div>
+    <div class="calc-tile"><div class="calc-label">이번 달 진료비</div><div class="calc-value">${monthCost.toLocaleString()}</div><div class="calc-unit">원</div></div>
+  `;
+  const list = document.getElementById('vetList');
+  list.innerHTML = '';
+  if (!visits.length) { list.innerHTML = '<div class="weight-empty">기록이 없어요</div>'; return; }
+  visits.forEach(v => {
+    const div = document.createElement('div');
+    div.className = 'log-item vet-item';
+    div.innerHTML = `
+      <div class="log-main">
+        <span class="vet-hospital">${escapeHTML(v.hospital || '병원')}</span>
+        <span class="log-date">${v.visit_date}</span>
+        ${v.reason ? ` · ${escapeHTML(v.reason)}` : ''}
+        ${v.cost ? ` · <span class="vet-cost">${v.cost.toLocaleString()}원</span>` : ''}
+        ${v.memo ? `<div class="food-memo">${escapeHTML(v.memo)}</div>` : ''}
+      </div>
+      ${v.photo_url ? `<img class="vet-photo-thumb" src="${v.photo_url}" alt="">` : ''}
+      <button class="log-del">삭제</button>
+    `;
+    div.querySelector('.log-del').addEventListener('click', async () => {
+      await DB.deleteVetVisit(v.id);
+      renderVetSection();
+    });
+    list.appendChild(div);
+  });
+}
+
+/* ---------- Medications ---------- */
+document.getElementById('medAddToggleBtn').addEventListener('click', () => {
+  const form = document.getElementById('medForm');
+  form.style.display = form.style.display === 'none' ? 'flex' : 'none';
+});
+document.getElementById('medStart').value = todayStr();
+document.getElementById('medForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name = document.getElementById('medName').value.trim();
+  if (!name) return;
+  await DB.addMedication({
+    cat: CAT, name,
+    start_date: document.getElementById('medStart').value || todayStr(),
+    end_date: document.getElementById('medEnd').value || null,
+    times_per_day: parseInt(document.getElementById('medTimesPerDay').value, 10),
+    memo: document.getElementById('medMemo').value.trim(),
+  });
+  document.getElementById('medForm').reset();
+  document.getElementById('medStart').value = todayStr();
+  document.getElementById('medForm').style.display = 'none';
+  renderMedSection();
+});
+const SLOT_LABEL = { morning: '아침', evening: '저녁', once: '복용' };
+async function renderMedSection() {
+  const meds = await DB.listMedications(CAT);
+  const today = todayStr();
+  const active = meds.filter(m => !m.end_date || m.end_date >= today);
+  const past = meds.filter(m => m.end_date && m.end_date < today);
+
+  const logs = await DB.listMedicationLogs(active.map(m => m.id));
+  const takenSet = new Set(logs.map(l => `${l.medication_id}_${l.log_date}_${l.slot}`));
+
+  const activeEl = document.getElementById('medActiveList');
+  activeEl.innerHTML = '';
+  if (!active.length) {
+    activeEl.innerHTML = '<div class="weight-empty">복용 중인 약이 없어요</div>';
+  }
+  active.forEach(m => {
+    const slots = m.times_per_day === 2 ? ['morning', 'evening'] : ['once'];
+    const div = document.createElement('div');
+    div.className = 'med-item';
+    div.innerHTML = `
+      <div class="med-item-head">
+        <span class="med-name">${escapeHTML(m.name)}</span>
+        <span class="med-period">${m.start_date}부터${m.end_date ? ` ~ ${m.end_date}` : ' (계속 복용 중)'}</span>
+        <button type="button" class="med-end-btn" data-id="${m.id}">복용 종료</button>
+      </div>
+      <div class="med-checks">
+        ${slots.map(slot => {
+          const key = `${m.id}_${today}_${slot}`;
+          const checked = takenSet.has(key);
+          return `<label class="med-check ${checked ? 'checked' : ''}"><input type="checkbox" data-med="${m.id}" data-slot="${slot}" ${checked ? 'checked' : ''}> ${SLOT_LABEL[slot]}</label>`;
+        }).join('')}
+      </div>
+      ${m.memo ? `<div class="food-memo">${escapeHTML(m.memo)}</div>` : ''}
+    `;
+    div.querySelectorAll('.med-check input').forEach(cb => {
+      cb.addEventListener('change', async () => {
+        await DB.setMedicationLog(m.id, today, cb.dataset.slot, cb.checked);
+        cb.closest('.med-check').classList.toggle('checked', cb.checked);
+      });
+    });
+    div.querySelector('.med-end-btn').addEventListener('click', async () => {
+      await DB.updateMedication(m.id, { end_date: today });
+      renderMedSection();
+    });
+    activeEl.appendChild(div);
+  });
+
+  const pastEl = document.getElementById('medPastList');
+  pastEl.innerHTML = '';
+  past.forEach(m => {
+    const div = document.createElement('div');
+    div.className = 'log-item med-past-item';
+    div.innerHTML = `<div class="log-main">${escapeHTML(m.name)} <span class="log-date">${m.start_date} ~ ${m.end_date}</span></div><button class="log-del">삭제</button>`;
+    div.querySelector('.log-del').addEventListener('click', async () => {
+      await DB.deleteMedication(m.id);
+      renderMedSection();
+    });
+    pastEl.appendChild(div);
+  });
+}
+
 /* ---------- Init ---------- */
 (async function init() {
   [settings, profile] = await Promise.all([DB.getSettings(), DB.getCatProfile(CAT)]);
@@ -434,4 +572,6 @@ document.getElementById('litterQuickPoop').addEventListener('click', () => quick
   await renderPlaySection();
   await renderGroomingSection();
   await renderLitterSection();
+  await renderVetSection();
+  await renderMedSection();
 })();
