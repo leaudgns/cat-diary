@@ -170,6 +170,22 @@ const DB = (() => {
     return rest(`/play_log?id=eq.${id}`, { method: 'DELETE' });
   }
 
+  /* ---------- grooming log (bath / nail trim) ---------- */
+  async function listGrooming(cat) {
+    return rest(`/grooming_log?cat=eq.${cat}&select=*&order=done_date.desc,created_at.desc`);
+  }
+  async function addGrooming(entry) {
+    const rows = await rest('/grooming_log', {
+      method: 'POST',
+      headers: { Prefer: 'return=representation' },
+      body: JSON.stringify(entry),
+    });
+    return rows[0];
+  }
+  async function deleteGrooming(id) {
+    return rest(`/grooming_log?id=eq.${id}`, { method: 'DELETE' });
+  }
+
   return {
     getSettings, updateSettings,
     listEvents, addEvent, deleteEvent,
@@ -179,6 +195,7 @@ const DB = (() => {
     getCatProfile, updateCatProfile,
     listWeights, addWeight, deleteWeight,
     listPlays, addPlay, deletePlay,
+    listGrooming, addGrooming, deleteGrooming,
     todayStr,
   };
 })();

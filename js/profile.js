@@ -243,6 +243,67 @@ document.getElementById('playForm').addEventListener('submit', async (e) => {
 });
 document.getElementById('playDate').value = todayStr();
 
+/* ---------- Grooming (bath / nail trim) ---------- */
+const GROOMING_RULES = {
+  bath: { label: '목욕', emoji: '🛁', yellow: 30, red: 45 },
+  nail: { label: '발톱 관리', emoji: '💅', yellow: 14, red: 21 },
+};
+function renderGroomingStatus(type, entries) {
+  const rule = GROOMING_RULES[type];
+  const el = document.getElementById(`groomStatus_${type}`);
+  if (!entries.length) {
+    el.className = 'toy-status toy-yellow';
+    el.innerHTML = `<span class="toy-emoji">${rule.emoji}</span><div class="toy-text"><strong>${rule.label} 기록이 없어요</strong><span>아래 버튼으로 기록을 시작해보세요</span></div>`;
+    return;
+  }
+  const days = daysBetween(entries[0].done_date);
+  let level = 'green';
+  if (days >= rule.red) level = 'red';
+  else if (days >= rule.yellow) level = 'yellow';
+  const title = level === 'red' ? `${rule.label} 할 때예요!` : level === 'yellow' ? `슬슬 ${rule.label}할 때예요` : `${rule.label} 잘 관리되고 있어요`;
+  el.className = `toy-status toy-${level}`;
+  el.innerHTML = `<span class="toy-emoji">${rule.emoji}</span><div class="toy-text"><strong>${title}</strong><span>${rule.label}한 지 ${days}일째 (${entries[0].done_date})</span></div>`;
+}
+async function renderGroomingSection() {
+  const all = await DB.listGrooming(CAT);
+  for (const type of ['bath', 'nail']) {
+    const entries = all.filter(e => e.type === type);
+    renderGroomingStatus(type, entries);
+    const list = document.getElementById(`groomList_${type}`);
+    list.innerHTML = '';
+    entries.slice(0, 5).forEach(e => {
+      const div = document.createElement('div');
+      div.className = 'log-item';
+      div.innerHTML = `<div class="log-main"><span class="log-date">${e.done_date}</span>${e.memo ? ` · ${escapeHTML(e.memo)}` : ''}</div><button class="log-del">삭제</button>`;
+      div.querySelector('.log-del').addEventListener('click', async () => {
+        await DB.deleteGrooming(e.id);
+        renderGroomingSection();
+      });
+      list.appendChild(div);
+    });
+  }
+}
+function wireGroomingQuickLog(type) {
+  document.getElementById(`groomQuickBtn_${type}`).addEventListener('click', async () => {
+    await DB.addGrooming({ cat: CAT, type, done_date: todayStr(), memo: '' });
+    renderGroomingSection();
+  });
+  document.getElementById(`groomForm_${type}`).addEventListener('submit', async (e) => {
+    e.preventDefault();
+    await DB.addGrooming({
+      cat: CAT, type,
+      done_date: document.getElementById(`groomDate_${type}`).value || todayStr(),
+      memo: document.getElementById(`groomMemo_${type}`).value.trim(),
+    });
+    document.getElementById(`groomForm_${type}`).reset();
+    document.getElementById(`groomDate_${type}`).value = todayStr();
+    renderGroomingSection();
+  });
+  document.getElementById(`groomDate_${type}`).value = todayStr();
+}
+wireGroomingQuickLog('bath');
+wireGroomingQuickLog('nail');
+
 /* ---------- Init ---------- */
 (async function init() {
   [settings, profile] = await Promise.all([DB.getSettings(), DB.getCatProfile(CAT)]);
@@ -250,4 +311,5 @@ document.getElementById('playDate').value = todayStr();
   renderInfoDisplay();
   await renderWeightSection();
   await renderPlaySection();
+  await renderGroomingSection();
 })();

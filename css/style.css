@@ -311,6 +311,8 @@ main { max-width: 1000px; margin: 0 auto; padding: 24px 20px 60px; }
 .simple-form input[type="number"] { width: 90px; }
 .simple-form button { border: none; background: var(--tortie); color: white; padding: 8px 18px; border-radius: 8px; cursor: pointer; font-weight: 700; }
 .simple-form button:hover { background: var(--tortie-dark); }
+.quick-log-btn { background: var(--sage) !important; font-size: 0.9rem; padding: 10px 20px !important; }
+.quick-log-btn:hover { filter: brightness(0.93); }
 
 .log-list { display: flex; flex-direction: column; gap: 8px; }
 .log-item { display: flex; align-items: center; gap: 10px; background: var(--cream); padding: 8px 12px; border-radius: 9px; font-size: 0.85rem; }

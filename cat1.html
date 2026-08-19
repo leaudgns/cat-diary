@@ -55,6 +55,34 @@
     </form>
     <div class="log-list" id="playList"></div>
   </div>
+
+  <div class="section-card">
+    <h3>목욕 관리</h3>
+    <div class="toy-status" id="groomStatus_bath"></div>
+    <div class="simple-form">
+      <button type="button" class="quick-log-btn" id="groomQuickBtn_bath">🛁 오늘 목욕했어요</button>
+    </div>
+    <form id="groomForm_bath" class="simple-form">
+      <input type="date" id="groomDate_bath">
+      <input type="text" id="groomMemo_bath" placeholder="메모 (선택)">
+      <button type="submit">다른 날짜로 기록</button>
+    </form>
+    <div class="log-list" id="groomList_bath"></div>
+  </div>
+
+  <div class="section-card">
+    <h3>발톱 관리</h3>
+    <div class="toy-status" id="groomStatus_nail"></div>
+    <div class="simple-form">
+      <button type="button" class="quick-log-btn" id="groomQuickBtn_nail">💅 오늘 발톱 정리했어요</button>
+    </div>
+    <form id="groomForm_nail" class="simple-form">
+      <input type="date" id="groomDate_nail">
+      <input type="text" id="groomMemo_nail" placeholder="메모 (선택)">
+      <button type="submit">다른 날짜로 기록</button>
+    </form>
+    <div class="log-list" id="groomList_nail"></div>
+  </div>
 </main>
 
 <script src="js/config.js"></script>
